@@ -1,0 +1,142 @@
+# DRDO Offline Routing Project - Linux Setup Guide
+
+This guide details step-by-step how to set up the offline routing project (Spring Boot backend + Angular/Electron frontend) from scratch on a fresh Linux PC (e.g., Ubuntu/Debian).
+
+## 1. Install System Prerequisites
+
+Open a terminal and install the required foundational tools:
+
+```bash
+# Update package list
+sudo apt update && sudo apt upgrade -y
+
+# Install Git, curl, and build tools
+sudo apt install -y git curl build-essential wget unzip
+```
+
+## 2. Install Database (PostgreSQL, PostGIS, pgRouting)
+
+The routing engine relies on PostgreSQL with the PostGIS and pgRouting spatial extensions.
+
+```bash
+# Install PostgreSQL 15 (or the default available version)
+sudo apt install -y postgresql postgresql-contrib
+
+# Install PostGIS and pgRouting extensions
+sudo apt install -y postgis postgresql-15-postgis-3 postgresql-15-pgrouting
+
+# (Note: Adjust the "15" in the package names above if your Ubuntu version defaults to PostgreSQL 14 or 16)
+```
+
+## 3. Database Configuration
+
+Start the database and set up the specific user and schemas required by the backend.
+
+```bash
+# Ensure PostgreSQL is running
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Switch to the postgres system user to configure the database
+sudo -i -u postgres
+
+# Change the default postgres user password to "admin" (required by application.properties)
+psql -c "ALTER USER postgres WITH PASSWORD 'admin';"
+
+# Create the routing database
+createdb ind_routing
+
+# Connect to the new database
+psql -d ind_routing
+
+# Enable the required spatial extensions (Run these inside the psql prompt)
+CREATE EXTENSION postgis;
+CREATE EXTENSION pgrouting;
+\q
+
+# Exit the postgres user session
+exit
+```
+
+## 4. Import Road Network Data
+
+To route offline, you need to import OpenStreetMap (.osm) data into the `ind_routing` database. 
+
+```bash
+# Install the osm2pgrouting tool
+sudo apt install -y osm2pgrouting
+
+# Download a map extract (Example: India or a specific state from Geofabrik)
+wget https://download.geofabrik.de/asia/india-latest.osm.pbf
+
+# osm2pgrouting requires raw XML, so convert the PBF to OSM format using osmium
+sudo apt install -y osmium-tool
+osmium cat india-latest.osm.pbf -o india-latest.osm
+
+# Import the data into the database
+# WARNING: This can take hours and requires significant RAM for an entire country!
+osm2pgrouting -f india-latest.osm -d ind_routing -U postgres -W admin -h localhost --conf /usr/share/osm2pgrouting/mapconfig.xml
+```
+
+*(Note: If you already have a SQL dump of the populated `ind_routing` database from another machine, you can simply restore it using `pg_restore` instead of running osm2pgrouting).*
+
+## 5. Install Java & Start the Backend
+
+The backend is a Spring Boot application running on Java 17.
+
+```bash
+# Install OpenJDK 17
+sudo apt install -y openjdk-17-jdk
+
+# Verify Java version
+java -version
+
+# Clone the repository (if you haven't already copied it over)
+# git clone <your-repo-url> DRDO2
+cd DRDO2/offline-router
+
+# Make the Maven wrapper executable
+chmod +x mvnw
+
+# Build and start the backend
+./mvnw clean install
+./mvnw spring-boot:run
+```
+The backend will start on `http://localhost:8080`.
+
+## 6. Install Node.js & Start the Frontend
+
+The frontend is an Angular 18 application wrapped in Electron.
+
+```bash
+# Install Node.js v20 (LTS) via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Verify Node and npm
+node -v
+npm -v
+
+# Navigate to the frontend directory
+cd ../offline-routing-desktop
+
+# Install JavaScript dependencies
+npm install
+
+# Map Tiles Setup:
+# The frontend requires raw offline XYZ map tiles (JPG/PNG) to render the map without internet.
+# Create the offline-map-data folder if it doesn't exist:
+mkdir -p offline-map-data
+# Copy your pre-downloaded map tile folders (0/, 1/, 2/ ... zoom levels) into the offline-map-data directory.
+
+# Start the application as a Desktop (Electron) app
+npm run electron
+
+# OR start it as a standard web application in your browser
+npm start
+```
+
+## Troubleshooting
+- **Port 8080 in use**: If the backend fails to start, ensure no other service is using port 8080 (`sudo lsof -i :8080`).
+- **Missing map tiles**: If the screen is gray but routes draw successfully, your `offline-map-data` folder is empty or the tiles are placed in the wrong directory structure. It should look like `offline-map-data/{z}/{x}/{y}.jpg`.
+- **"No offline path could be found"**: If you click two points and get an error, the OpenStreetMap data you imported might have missing roads or topological gaps. Ensure you used `osm2pgrouting` correctly with a complete map extract.

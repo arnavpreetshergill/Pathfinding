@@ -1,0 +1,248 @@
+2026-06-18 02:04:17 [main] INFO  c.e.o.OfflineRouterApplication - Starting OfflineRouterApplication v0.0.1-SNAPSHOT using Java 17.0.18 with PID 25552 (C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop\backend\offline-router.jar started by Admin in C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop)
+2026-06-18 02:04:17 [main] DEBUG c.e.o.OfflineRouterApplication - Running with Spring Boot v4.1.0, Spring v7.0.8
+2026-06-18 02:04:17 [main] INFO  c.e.o.OfflineRouterApplication - No active profile set, falling back to 1 default profile: "default"
+2026-06-18 02:04:18 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 0 (http)
+2026-06-18 02:04:18 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 02:04:18 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-18 02:04:18 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-06-18 02:04:18 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1174 ms
+2026-06-18 02:04:19 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 02:04:19 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 50171 (http) with context path '/'
+2026-06-18 02:04:19 [main] INFO  c.e.o.OfflineRouterApplication - Started OfflineRouterApplication in 2.451 seconds (process running for 3.343)
+2026-06-18 02:04:21 [http-nio-auto-1-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-18 02:04:21 [http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-06-18 02:04:21 [http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [67.69775390625001,18.67747125852608,80.72753906250001,26.41155054662258] zoom=7
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@63c466c6
+2026-06-18 02:04:22 [http-nio-auto-1-exec-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-18 02:04:22 [http-nio-auto-1-exec-3] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [67.79663085937501,18.719078953749612,80.82641601562501,26.450885040370395] zoom=7
+2026-06-18 02:04:22 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:22 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:22 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:22 [http-nio-auto-1-exec-2] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [72.87231445312501,19.652509461179534,85.90209960937501,27.33233446828281] zoom=7
+2026-06-18 02:04:22 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:22 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:22 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:25 [http-nio-auto-1-exec-4] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [77.13226318359376,23.082154756226334,80.38970947265626,24.995913547503655] zoom=9
+2026-06-18 02:04:25 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:25 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:25 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:25 [http-nio-auto-1-exec-3] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Ignoring exception, response committed already: org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: ServletOutputStream failed to write: java.io.IOException: An established connection was aborted by the software in your host machine
+2026-06-18 02:04:25 [http-nio-auto-1-exec-1] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Ignoring exception, response committed already: org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: ServletOutputStream failed to write: java.io.IOException: An established connection was aborted by the software in your host machine
+2026-06-18 02:04:25 [http-nio-auto-1-exec-5] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [77.13226318359376,23.082154756226334,80.38970947265626,24.995913547503655] zoom=9
+2026-06-18 02:04:25 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:25 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:25 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:26 [http-nio-auto-1-exec-4] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Ignoring exception, response committed already: org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: ServletOutputStream failed to write: java.io.IOException: An established connection was aborted by the software in your host machine
+2026-06-18 02:04:26 [http-nio-auto-1-exec-6] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [77.05810546875001,23.3874035176434,80.31555175781251,25.29662122168382] zoom=9
+2026-06-18 02:04:26 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:26 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:26 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:28 [http-nio-auto-1-exec-7] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.08395385742189,24.141682145082193,78.89831542968751,24.618871426322706] zoom=11
+2026-06-18 02:04:28 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:28 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:28 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:32 [http-nio-auto-1-exec-8] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.08395385742189,24.151139470863754,78.89831542968751,24.628293115720375] zoom=11
+2026-06-18 02:04:32 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:32 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:04:32 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] INFO  c.e.o.controller.RoutingController - Calculating shortest path from (78.526154, 24.321517) to (78.462982, 24.588918)
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [WITH closest_segment AS (
+    SELECT
+        gid,
+        source,
+        target,
+        geom,
+        ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)) as snap_pt
+    FROM roads_lines
+    WHERE highway NOT IN ('track', 'path', 'footway', 'steps', 'pedestrian', 'construction')
+    ORDER BY geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
+    LIMIT 1
+)
+SELECT
+    CASE
+        WHEN ST_Distance(snap_pt, ST_StartPoint(geom)) < ST_Distance(snap_pt, ST_EndPoint(geom)) THEN source
+        ELSE target
+    END as vertex_id,
+    gid as edge_id,
+    ST_LineLocatePoint(geom, snap_pt) as fraction,
+    ST_X(snap_pt) as snapped_lng,
+    ST_Y(snap_pt) as snapped_lat
+FROM closest_segment
+]
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [WITH closest_segment AS (
+    SELECT
+        gid,
+        source,
+        target,
+        geom,
+        ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)) as snap_pt
+    FROM roads_lines
+    WHERE highway NOT IN ('track', 'path', 'footway', 'steps', 'pedestrian', 'construction')
+    ORDER BY geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
+    LIMIT 1
+)
+SELECT
+    CASE
+        WHEN ST_Distance(snap_pt, ST_StartPoint(geom)) < ST_Distance(snap_pt, ST_EndPoint(geom)) THEN source
+        ELSE target
+    END as vertex_id,
+    gid as edge_id,
+    ST_LineLocatePoint(geom, snap_pt) as fraction,
+    ST_X(snap_pt) as snapped_lng,
+    ST_Y(snap_pt) as snapped_lat
+FROM closest_segment
+]
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] INFO  c.e.o.service.RoutingService - Executing pgRouting A* query between node 10248089 and node 10067516
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT ST_AsGeoJSON(r.geom) as geojson
+FROM pgr_aStar(
+    'SELECT gid as id, source, target, cost, reverse_cost, x1, y1, x2, y2
+     FROM roads_lines
+     WHERE highway NOT IN (''track'', ''path'', ''footway'', ''steps'', ''pedestrian'', ''construction'')',
+    ?::bigint, ?::bigint, directed := false
+) AS p
+JOIN roads_lines r ON p.edge = r.gid
+ORDER BY p.seq
+LIMIT 10000
+]
+2026-06-18 02:04:33 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:35 [http-nio-auto-1-exec-9] INFO  c.e.o.controller.RoutingController - Route calculated successfully for coordinates: Start(78.526154, 24.321517), End(78.462982, 24.588918)
+2026-06-18 02:05:36 [http-nio-auto-1-exec-10] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [76.85211181640625,23.93103407144254,80.10955810546876,25.83203324251533] zoom=9
+2026-06-18 02:05:36 [http-nio-auto-1-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:36 [http-nio-auto-1-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:36 [http-nio-auto-1-exec-10] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:39 [http-nio-auto-1-exec-2] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.11279296875001,24.350224487616444,78.92715454101564,24.826624956562167] zoom=11
+2026-06-18 02:05:39 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:39 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:39 [http-nio-auto-1-exec-2] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:40 [http-nio-auto-1-exec-1] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.32290649414064,24.41995553778991,78.73008728027345,24.658250243455655] zoom=12
+2026-06-18 02:05:40 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:40 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:40 [http-nio-auto-1-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:40 [http-nio-auto-1-exec-3] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.42796325683595,24.45480662639424,78.63155364990236,24.573977519960703] zoom=13
+2026-06-18 02:05:40 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:40 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:40 [http-nio-auto-1-exec-3] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:41 [http-nio-auto-1-exec-4] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.42796325683595,24.45480662639424,78.63155364990236,24.573977519960703] zoom=13
+2026-06-18 02:05:41 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:41 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:41 [http-nio-auto-1-exec-4] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:42 [http-nio-auto-1-exec-5] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.45723152160646,24.472150437226876,78.55902671813966,24.531741796551437] zoom=14
+2026-06-18 02:05:42 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:42 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:42 [http-nio-auto-1-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:42 [http-nio-auto-1-exec-6] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [78.28857421875001,24.406512634677505,78.69575500488283,24.64483283510569] zoom=12
+2026-06-18 02:05:42 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:42 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:42 [http-nio-auto-1-exec-6] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:44 [http-nio-auto-1-exec-7] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [77.61291503906251,24.144247312175384,79.24163818359376,25.0967921880346] zoom=10
+2026-06-18 02:05:44 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:44 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:44 [http-nio-auto-1-exec-7] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:45 [http-nio-auto-1-exec-8] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [76.71203613281251,23.792884472869158,79.969482421875,25.695988053632746] zoom=9
+2026-06-18 02:05:45 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:45 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:45 [http-nio-auto-1-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2026-06-18 02:05:46 [http-nio-auto-1-exec-9] DEBUG c.e.o.service.RoutingService - Fetching roads in bounds [74.65209960937501,23.01907618729305,81.16699218750001,26.819168595042523] zoom=8
+2026-06-18 02:05:46 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2026-06-18 02:05:46 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT name, highway, ST_AsGeoJSON(geom) as geojson
+FROM roads_lines
+WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
+  AND highway IN (?, ?, ?, ?, ?, ?)
+LIMIT 5000
+]
+2026-06-18 02:05:46 [http-nio-auto-1-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource

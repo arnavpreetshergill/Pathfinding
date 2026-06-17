@@ -1,0 +1,170 @@
+/*
+================================================================================
+OFFLINE ROUTING ENGINE: MASTER POSTGRESQL SCRIPT
+================================================================================
+REQUIREMENTS:
+1. PostgreSQL installed.
+2. PostGIS and pgRouting extensions installed on the host machine.
+3. 'osm2pgsql' installed on the host machine.
+
+STEP 1: DOWNLOAD & IMPORT DATA (Run in your OS Terminal, NOT in psql)
+--------------------------------------------------------------------------------
+-- Download the raw OpenStreetMap data for India (from Geofabrik)
+wget https://download.geofabrik.de/asia/india-latest.osm.pbf
+
+-- Use osm2pgsql to import the raw file into your database
+-- (Replace 'postgres' with your DB username)
+osm2pgsql -d routing_db -U postgres -W -H localhost --latlong india-latest.osm.pbf
+*/
+
+
+/*
+================================================================================
+STEP 2: DATABASE & EXTENSION INITIALIZATION (Run in psql)
+================================================================================
+*/
+-- Connect to the database
+\c routing_db;
+
+-- Enable the required spatial and routing engines
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pgrouting;
+
+
+/*
+================================================================================
+STEP 3: DATA TRANSFORMATION (Raw OSM -> Drivable Roads)
+================================================================================
+The raw import creates a massive table called 'planet_osm_line'. We need to 
+extract only the drivable roads and discard buildings, rivers, and footpaths.
+*/
+CREATE TABLE roads_lines AS 
+SELECT 
+    osm_id, 
+    way AS geom, 
+    highway, 
+    name,
+    oneway,
+    ST_Length(way::geography) AS length_m
+FROM planet_osm_line 
+WHERE highway IS NOT NULL 
+  AND highway NOT IN ('footway', 'pedestrian', 'steps', 'path', 'cycleway', 'track');
+
+-- Add a standard primary key for pgRouting to use
+ALTER TABLE roads_lines ADD COLUMN gid SERIAL PRIMARY KEY;
+
+
+/*
+================================================================================
+STEP 4: TOPOLOGY GENERATION (Building the Graph)
+================================================================================
+We create 'source' and 'target' columns, then ask pgRouting to connect the 
+millions of lines together at their intersections to build a traversable graph.
+*/
+ALTER TABLE roads_lines ADD COLUMN source integer;
+ALTER TABLE roads_lines ADD COLUMN target integer;
+
+-- WARNING: This command takes a very long time on a country-sized map.
+-- It connects roads if their vertices are within 0.00001 degrees of each other.
+-- It automatically creates the 'roads_lines_vertices_pgr' table.
+SELECT pgr_createTopology('roads_lines', 0.00001, 'geom', 'gid');
+
+
+/*
+================================================================================
+STEP 5: COST & HEURISTIC ASSIGNMENT (For A* Algorithm)
+================================================================================
+A* requires two things: traversal cost (road length + one-way rules) 
+and spatial heuristics (exact x/y coordinates of the road ends).
+*/
+ALTER TABLE roads_lines ADD COLUMN cost double precision;
+ALTER TABLE roads_lines ADD COLUMN reverse_cost double precision;
+ALTER TABLE roads_lines ADD COLUMN x1 double precision;
+ALTER TABLE roads_lines ADD COLUMN y1 double precision;
+ALTER TABLE roads_lines ADD COLUMN x2 double precision;
+ALTER TABLE roads_lines ADD COLUMN y2 double precision;
+
+-- Apply One-Way street rules (Cost = -1 means 'Do Not Enter')
+UPDATE roads_lines 
+SET 
+    cost = length_m,
+    reverse_cost = CASE 
+        WHEN oneway IN ('yes', '1', 'true') THEN -1 
+        ELSE length_m 
+    END;
+
+-- Extract exact mathematical coordinates for the A* heuristic engine
+UPDATE roads_lines 
+SET 
+    x1 = ST_X(ST_StartPoint(geom)),
+    y1 = ST_Y(ST_StartPoint(geom)),
+    x2 = ST_X(ST_EndPoint(geom)),
+    y2 = ST_Y(ST_EndPoint(geom));
+
+
+/*
+================================================================================
+STEP 6: PERFORMANCE INDEXING (Crucial for 8GB RAM execution)
+================================================================================
+Without these, standard queries will scan millions of rows and crash.
+*/
+-- Spatial Indexes for nearest-neighbor lookups
+CREATE INDEX idx_roads_geom ON roads_lines USING GIST (geom);
+CREATE INDEX idx_vertices_geom ON roads_lines_vertices_pgr USING GIST (the_geom);
+
+-- B-Tree Indexes for fast graph traversal
+CREATE INDEX idx_roads_source ON roads_lines (source);
+CREATE INDEX idx_roads_target ON roads_lines (target);
+
+-- Clean up the database statistics for the query planner
+VACUUM ANALYZE roads_lines;
+VACUUM ANALYZE roads_lines_vertices_pgr;
+
+
+/*
+================================================================================
+STEP 7: THE UNIFIED ROUTING QUERY (The Spring Boot API Payload)
+================================================================================
+This is the exact CTE query your Spring Boot application runs to snap 
+user coordinates, route via A*, and return GeoJSON to the Angular frontend.
+
+Replace the ST_MakePoint parameters with your actual Start and End Lng/Lat.
+*/
+WITH start_node AS (
+    SELECT id, the_geom 
+    FROM roads_lines_vertices_pgr
+    ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(77.2167, 28.6315), 4326)
+    LIMIT 1
+),
+end_node AS (
+    SELECT id, the_geom 
+    FROM roads_lines_vertices_pgr
+    ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(77.0888, 28.4950), 4326)
+    LIMIT 1
+),
+route AS (
+    SELECT path.seq, path.node, path.edge, path.cost, geom 
+    FROM pgr_aStar(
+        'SELECT gid as id, source, target, cost, reverse_cost, x1, y1, x2, y2 FROM roads_lines',
+        (SELECT id FROM start_node),
+        (SELECT id FROM end_node),
+        directed := true
+    ) AS path
+    LEFT JOIN roads_lines AS rd ON path.edge = rd.gid
+)
+SELECT 
+    ST_AsGeoJSON(geom) AS geojson_segment,
+    (SELECT ST_X(the_geom) FROM start_node) AS start_snap_lng,
+    (SELECT ST_Y(the_geom) FROM start_node) AS start_snap_lat,
+    (SELECT ST_X(the_geom) FROM end_node) AS end_snap_lng,
+    (SELECT ST_Y(the_geom) FROM end_node) AS end_snap_lat
+FROM route 
+WHERE geom IS NOT NULL;
+
+-- END OF SCRIPT
+
+
+
+pg_restore -U postgres -d routing_db -1 routing_db_backup.dump
+
+to restore the database

@@ -1,0 +1,54 @@
+<div class="control-deck" role="region" aria-label="Routing controls">
+  <h3>Routing App</h3>
+  <p class="subtitle">Click map to set points, or enter coordinates.</p>
+
+  <div *ngIf="errorMessage" class="error-alert" role="alert">
+    <span>{{ errorMessage }}</span>
+    <button class="error-close" (click)="clearError()" aria-label="Dismiss error">×</button>
+  </div>
+
+  <div class="input-group">
+    <label for="start-lng">Start Location</label>
+    <div class="row">
+      <input id="start-lat" type="number" step="0.000001" placeholder="Lat" aria-label="Start latitude"
+        [(ngModel)]="startLat">
+      <input id="start-lng" type="number" step="0.000001" placeholder="Lng" aria-label="Start longitude"
+        [(ngModel)]="startLng">
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="end-lng">End Location</label>
+    <div class="row">
+      <input id="end-lat" type="number" step="0.000001" placeholder="Lat" aria-label="End latitude"
+        [(ngModel)]="endLat">
+      <input id="end-lng" type="number" step="0.000001" placeholder="Lng" aria-label="End longitude"
+        [(ngModel)]="endLng">
+    </div>
+  </div>
+
+  <div class="toggle-group">
+    <label class="toggle-label">
+      <input type="checkbox" [(ngModel)]="renderRoads" (change)="toggleRoads()" aria-label="Toggle road rendering">
+      <span>Show Roads</span>
+    </label>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-primary" (click)="triggerManualRoute()" [disabled]="isLoading"
+      aria-label="Calculate route between start and end points">Calculate Route</button>
+    <button class="btn btn-secondary" (click)="clearMapVisuals()" [disabled]="isLoading"
+      aria-label="Clear all markers and route from map">Clear</button>
+  </div>
+</div>
+
+<div id="map" role="region" aria-label="Interactive map for routing"></div>
+
+<div class="lockout-overlay" *ngIf="isLoading" role="dialog" aria-modal="true" aria-labelledby="loading-title">
+  <div class="modal-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <h4 id="loading-title">Computing Path</h4>
+    <p>Calculating offline route logic. Please wait...</p>
+    <button class="btn btn-danger" (click)="cancelCalculation()" aria-label="Cancel route calculation">Cancel</button>
+  </div>
+</div>

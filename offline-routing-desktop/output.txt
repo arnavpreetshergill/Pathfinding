@@ -1,0 +1,63 @@
+
+Starting Java Backend...
+Local static server running on http://127.0.0.1:57629
+[Backend]: 01:51:47,801 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found logback-core version 1.5.34
+01:51:47,808 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - Here is a list of configurators discovered as a service, by rank: 
+01:51:47,809 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+01:51:47,809 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+01:51:47,809 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+01:51:47,818 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 1 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+01:51:47,818 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+01:51:47,819 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+01:51:47,819 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+01:51:47,821 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [jar:nested:/C:/Users/Admin/Desktop/apps/DRDO2/offline-routing-desktop/dist/win-unpacked/resources/backend/offline-router.jar/!BOOT-INF/classes/!/logback.xml]
+01:51:47,935 |-WARN in ch.qos.logback.core.joran.action.ConversionRuleAction - [converterClass] attribute is deprecated and replaced by [class]. See element [conversionRule] near line 3
+01:51:48,062 |-INFO in ch.qos.logback.classic.model.processor.ConfigurationModelHandlerFull - Scan attribute not set or set to unrecognized value.
+01:51:48,065 |-INFO in ch.qos.logback.core.model.processor.ConversionRuleModelHandler - registering conversion word maskedMsg with class [com.example.offline_router.config.MaskedMessageConverter]
+01:51:48,107 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [CONSOLE]
+01:51:48,108 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+01:51:48,150 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+01:51:48,227 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - NOTE: Writing to the console can be slow. Try to avoid logging to the 
+01:51:48,227 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - console in production environments, especially in high volume systems.
+01:51:48,227 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - See also https://logback.qos.ch/codes.html#slowConsole
+01:51:48,230 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [FILE]
+01:51:48,230 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
+01:51:48,241 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+01:51:48,251 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@464064894 - setting totalSizeCap to 100 MB
+01:51:48,255 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@464064894 - Archive files will be limited to [10 MB] each.
+01:51:48,255 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@464064894 - No compression will be used
+01:51:48,261 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@464064894 - Will use the pattern logs/routing-service.%d{yyyy-MM-dd}.%i.log for the active file
+01:51:48,306 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy@732c2a62 - The date pattern is 'yyyy-MM-dd' from file name pattern 'logs/routing-service.%d{yyyy-MM-dd}.%i.log'.
+01:51:48,306 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy@732c2a62 - Roll-over at midnight.
+01:51:48,308 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy@732c2a62 - Setting initial period to 2026-06-16T20:21:48.306Z
+01:51:48,316 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE] - Active log file name: logs/routing-service.log
+01:51:48,316 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE] - File property is set to [logs/routing-service.log]
+01:51:48,323 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
+01:51:48,324 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [CONSOLE] to Logger[ROOT]
+01:51:48,325 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [FILE] to Logger[ROOT]
+01:51:48,326 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [com.example.offline_router] to DEBUG
+01:51:48,326 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.springframework.web] to INFO
+01:51:48,326 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.springframework.jdbc] to DEBUG
+01:51:48,326 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@272ed83b - End of configuration.
+01:51:48,327 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@41fecb8b - Registering current configuration as safe fallback point
+01:51:48,327 |-INFO in ch.qos.logback.classic.util.ContextInitializer@a3d8174 - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 508 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+[Backend ERR]: 01:51:48,940 |-WARN in ch.qos.logback.core.joran.action.ConversionRuleAction - [converterClass] attribute is deprecated and replaced by [class]. See element [conversionRule] near line 3
+[Backend]: 
+[Backend]: .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+[Backend]: :: Spring Boot ::                (v4.1.0)
+[Backend]: 2026-06-17 01:51:49 [main] INFO  c.e.o.OfflineRouterApplication - Starting OfflineRouterApplication v0.0.1-SNAPSHOT using Java 17.0.18 with PID 21800 (C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop\dist\win-unpacked\resources\backend\offline-router.jar started by Admin in C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop)
+[Backend]: 2026-06-17 01:51:49 [main] DEBUG c.e.o.OfflineRouterApplication - Running with Spring Boot v4.1.0, Spring v7.0.8
+[Backend]: 2026-06-17 01:51:49 [main] INFO  c.e.o.OfflineRouterApplication - No active profile set, falling back to 1 default profile: "default"
+[Backend]: 2026-06-17 01:51:50 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 0 (http)
+[Backend]: 2026-06-17 01:51:50 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-auto-1"]
+[Backend]: 2026-06-17 01:51:50 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+[Backend]: 2026-06-17 01:51:50 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22]
+[Backend]: 2026-06-17 01:51:50 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1661 ms
+[Backend]: 2026-06-17 01:51:51 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-auto-1"]
+[Backend]: 2026-06-17 01:51:52 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 60835 (http) with context path '/'
+[Backend]: 2026-06-17 01:51:52 [main] INFO  c.e.o.OfflineRouterApplication - Started OfflineRouterApplication in 3.572 seconds (process running for 4.898)

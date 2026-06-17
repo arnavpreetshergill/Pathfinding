@@ -1,0 +1,22 @@
+2026-06-18 01:55:37 [main] INFO  c.e.o.OfflineRouterApplication - Starting OfflineRouterApplication v0.0.1-SNAPSHOT using Java 17.0.18 with PID 4736 (C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop\backend\offline-router.jar started by Admin in C:\Users\Admin\Desktop\apps\DRDO2)
+2026-06-18 01:55:37 [main] DEBUG c.e.o.OfflineRouterApplication - Running with Spring Boot v4.1.0, Spring v7.0.8
+2026-06-18 01:55:37 [main] INFO  c.e.o.OfflineRouterApplication - No active profile set, falling back to 1 default profile: "default"
+2026-06-18 01:55:38 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 0 (http)
+2026-06-18 01:55:38 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 01:55:38 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-18 01:55:38 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-06-18 01:55:38 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1294 ms
+2026-06-18 01:55:39 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 01:55:39 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 52402 (http) with context path '/'
+2026-06-18 01:55:39 [main] INFO  c.e.o.OfflineRouterApplication - Started OfflineRouterApplication in 2.865 seconds (process running for 3.891)
+2026-06-18 01:56:33 [main] INFO  c.e.o.OfflineRouterApplication - Starting OfflineRouterApplication v0.0.1-SNAPSHOT using Java 17.0.18 with PID 8716 (C:\Users\Admin\Desktop\apps\DRDO2\offline-routing-desktop\backend\offline-router.jar started by Admin in C:\Users\Admin\Desktop\apps\DRDO2)
+2026-06-18 01:56:33 [main] DEBUG c.e.o.OfflineRouterApplication - Running with Spring Boot v4.1.0, Spring v7.0.8
+2026-06-18 01:56:33 [main] INFO  c.e.o.OfflineRouterApplication - No active profile set, falling back to 1 default profile: "default"
+2026-06-18 01:56:34 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 0 (http)
+2026-06-18 01:56:34 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 01:56:34 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-18 01:56:34 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-06-18 01:56:34 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1042 ms
+2026-06-18 01:56:34 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-auto-1"]
+2026-06-18 01:56:35 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 60135 (http) with context path '/'
+2026-06-18 01:56:35 [main] INFO  c.e.o.OfflineRouterApplication - Started OfflineRouterApplication in 2.237 seconds (process running for 3.047)
