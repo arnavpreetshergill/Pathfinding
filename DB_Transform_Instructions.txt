@@ -1,0 +1,250 @@
+================================================================================
+DATABASE TRANSFORMATION GUIDE — test4 Database
+================================================================================
+You mentioned you ONLY have the table "PanIndiaRoad_vertices_pgr" with columns:
+"id" and "the_geom".
+
+HOWEVER, pgRouting algorithms (like pgr_aStar) physically CANNOT route using
+only vertices (points). Routing requires EDGES (lines that connect the points). 
+
+Since you cannot import any other data, you MUST generate an edges table from
+your vertices table. The SQL script below will create the required edges table 
+("PanIndiaRoad") by connecting any vertices that are close to each other.
+
+
+================================================================================
+DATABASE CONNECTION DETAILS
+================================================================================
+The Java backend connects using these defaults (configurable via environment
+variables):
+
+  Host:     localhost          (env: DB_HOST)
+  Port:     5432               (env: DB_PORT)
+  Database: test4              (env: DB_NAME)
+  Username: postgres           (env: DB_USER)
+  Password: admin              (env: DB_PASSWORD)
+  Driver:   PostgreSQL (JDBC)
+
+Required PostgreSQL extensions:
+  - PostGIS    (spatial geometry functions)
+  - pgRouting  (graph routing algorithms like pgr_aStar)
+
+
+================================================================================
+TABLE SCHEMA REFERENCE
+================================================================================
+The Java backend (RoutingService.java) requires EXACTLY two tables in the
+database. Their schemas are described below.
+
+--------------------------------------------------------------------------------
+TABLE 1: "PanIndiaRoad_vertices_pgr"  (Vertices / Nodes)
+--------------------------------------------------------------------------------
+Purpose:  Stores individual road intersection points (nodes) on the map.
+          Used internally by pgRouting as the node reference for graph routing.
+          The backend does NOT query this table directly — pgRouting uses it
+          behind the scenes via the source/target columns of the edges table.
+
+Required Columns:
+  ┌──────────┬──────────────────┬──────────────────────────────────────────────┐
+  │  Column  │    Data Type     │  Description                                 │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ id       │ INTEGER (PK)     │ Unique identifier for each vertex/node.      │
+  │          │                  │ Referenced by "source" and "target" columns   │
+  │          │                  │ in the edges table.                           │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ the_geom │ GEOMETRY(Point,  │ Geographic location of the vertex as a       │
+  │          │   4326)          │ point. SRID must be 4326 (WGS 84 lat/lng).   │
+  └──────────┴──────────────────┴──────────────────────────────────────────────┘
+
+Notes:
+  - A spatial GiST index on "the_geom" is strongly recommended for performance.
+  - The "id" values must match the "source" and "target" values in the edges
+    table for pgRouting to build its graph correctly.
+
+--------------------------------------------------------------------------------
+TABLE 2: "PanIndiaRoad"  (Edges / Road Segments)
+--------------------------------------------------------------------------------
+Purpose:  Stores road segments (lines) connecting pairs of vertices.
+          This is the PRIMARY table the Java backend queries. It is used for:
+            - pgr_aStar routing (shortest path calculation)
+            - Snapping user clicks to the nearest road segment
+            - Retrieving road geometries for map display in a bounding box
+            - Extracting sub-segments when start/end are on the same edge
+
+Required Columns:
+  ┌──────────┬──────────────────┬──────────────────────────────────────────────┐
+  │  Column  │    Data Type     │  Description                                 │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ gid      │ INTEGER (PK)     │ Unique identifier for each road segment.     │
+  │          │                  │ Used as the edge ID by pgRouting (aliased     │
+  │          │                  │ as "id" in the A* query). Also used to join   │
+  │          │                  │ routing results back to geometry.             │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ source   │ INTEGER (FK)     │ The vertex ID where this road segment        │
+  │          │                  │ starts. Must reference an "id" in the         │
+  │          │                  │ "PanIndiaRoad_vertices_pgr" table.            │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ target   │ INTEGER (FK)     │ The vertex ID where this road segment        │
+  │          │                  │ ends. Must reference an "id" in the           │
+  │          │                  │ "PanIndiaRoad_vertices_pgr" table.            │
+  ├──────────┼──────────────────┼──────────────────────────────────────────────┤
+  │ geom     │ GEOMETRY(        │ The road segment line geometry. SRID must     │
+  │          │  LineString,     │ be 4326 (WGS 84). The backend computes ALL   │
+  │          │  4326)           │ other routing variables on-the-fly from this  │
+  │          │                  │ column:                                       │
+  │          │                  │   - cost = ST_Length(geom::geography)          │
+  │          │                  │   - reverse_cost = ST_Length(geom::geography)  │
+  │          │                  │   - x1 = ST_X(ST_StartPoint(geom))            │
+  │          │                  │   - y1 = ST_Y(ST_StartPoint(geom))            │
+  │          │                  │   - x2 = ST_X(ST_EndPoint(geom))              │
+  │          │                  │   - y2 = ST_Y(ST_EndPoint(geom))              │
+  │          │                  │ Also used for: snapping (ST_ClosestPoint),    │
+  │          │                  │ bounding box queries (&&), sub-segment        │
+  │          │                  │ extraction (ST_LineSubstring), and GeoJSON    │
+  │          │                  │ output (ST_AsGeoJSON).                        │
+  └──────────┴──────────────────┴──────────────────────────────────────────────┘
+
+Required Indexes (for query performance):
+  1. idx_panindiaroad_geom    — GiST index on "geom"   (spatial lookups)
+  2. idx_panindiaroad_source  — B-tree index on "source" (pgRouting graph)
+  3. idx_panindiaroad_target  — B-tree index on "target" (pgRouting graph)
+
+Notes:
+  - cost and reverse_cost are NOT stored columns. They are computed at query
+    time from geom using ST_Length(geom::geography), which gives the length
+    in meters. This means the graph is treated as UNDIRECTED (cost = reverse).
+  - The A* heuristic coordinates (x1, y1, x2, y2) are also computed at query
+    time from the start/end points of the geom column.
+  - The table name "PanIndiaRoad" is CASE-SENSITIVE (quoted identifier in SQL).
+    It must be created with double quotes to preserve the mixed case.
+
+
+================================================================================
+HOW THE BACKEND USES THESE TABLES (Query Summary)
+================================================================================
+
+1. SNAP USER CLICK TO NEAREST ROAD (getSnappedData):
+   Query: Finds the closest edge in "PanIndiaRoad" to a given lat/lng using
+          the <-> KNN distance operator on "geom". Returns the nearest
+          vertex_id (source or target), the edge_id (gid), the fractional
+          position along the edge, and snapped coordinates.
+   Tables used: "PanIndiaRoad" (columns: gid, source, target, geom)
+
+2. SAME-EDGE SHORTCUT (when start and end snap to the same edge):
+   Query: Uses ST_LineSubstring on "geom" to extract just the portion of
+          the road between the two snapped fractions.
+   Tables used: "PanIndiaRoad" (columns: gid, geom)
+
+3. A* SHORTEST PATH (pgr_aStar):
+   Query: Runs pgr_aStar with an inline sub-query that computes id, source,
+          target, cost, reverse_cost, x1, y1, x2, y2 — all derived from
+          gid, source, target, and geom. Joins results back to "PanIndiaRoad"
+          on gid to get the actual geometries as GeoJSON.
+   Tables used: "PanIndiaRoad" (columns: gid, source, target, geom)
+   Indirectly: "PanIndiaRoad_vertices_pgr" (via pgRouting's graph engine)
+
+4. GET ROADS IN BOUNDING BOX (getRoadsInBounds):
+   Query: Selects all road geometries that intersect a bounding box envelope
+          using the && spatial operator on "geom". Results capped by zoom:
+            zoom <=8: max 2000 | zoom <=11: max 5000 | zoom >11: max 8000
+   Tables used: "PanIndiaRoad" (columns: geom)
+
+
+================================================================================
+STEP 1: GENERATE THE EDGES TABLE ("PanIndiaRoad")
+================================================================================
+Connect to your test4 database and run this exact SQL to generate the required
+edges table from your vertices table:
+
+--- 1. Ensure extensions are enabled ---
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pgrouting;
+
+--- 2. Create the edges table by connecting nearby points ---
+--- Note: We are connecting points within 200 meters. 
+--- You can increase 200 if your points are further apart.
+CREATE TABLE "PanIndiaRoad" AS
+SELECT 
+    ROW_NUMBER() OVER () AS gid,
+    a.id AS source,
+    b.id AS target,
+    ST_MakeLine(a.the_geom, b.the_geom) AS geom
+FROM "PanIndiaRoad_vertices_pgr" a
+JOIN "PanIndiaRoad_vertices_pgr" b 
+  ON a.id < b.id 
+ AND ST_DWithin(a.the_geom::geography, b.the_geom::geography, 200);
+
+--- 3. Make 'gid' the primary key ---
+ALTER TABLE "PanIndiaRoad" ADD PRIMARY KEY (gid);
+ALTER TABLE "PanIndiaRoad" ALTER COLUMN gid TYPE integer;
+
+--- 4. Create performance indexes so routing is fast ---
+CREATE INDEX IF NOT EXISTS idx_panindiaroad_geom 
+    ON "PanIndiaRoad" USING GIST (geom);
+CREATE INDEX IF NOT EXISTS idx_panindiaroad_source 
+    ON "PanIndiaRoad" (source);
+CREATE INDEX IF NOT EXISTS idx_panindiaroad_target 
+    ON "PanIndiaRoad" (target);
+CREATE INDEX IF NOT EXISTS idx_panindiaroad_vertices_geom 
+    ON "PanIndiaRoad_vertices_pgr" USING GIST (the_geom);
+
+--- 5. Refresh database statistics ---
+VACUUM ANALYZE "PanIndiaRoad";
+VACUUM ANALYZE "PanIndiaRoad_vertices_pgr";
+
+
+================================================================================
+STEP 2: VERIFICATION
+================================================================================
+Once the script above finishes, you will have the EXACT two tables the 
+Java application needs:
+
+1. "PanIndiaRoad_vertices_pgr" (your original table with id, the_geom)
+2. "PanIndiaRoad" (the newly generated table with gid, source, target, geom)
+
+The Java code will compute all other routing variables (cost, distances, 
+coordinates) on-the-fly directly from the 'geom' column of this new table.
+
+To test if it worked, run these verification queries:
+
+--- Check that edges were created ---
+SELECT COUNT(*) AS edge_count FROM "PanIndiaRoad";
+-- Expected: Greater than 0. If 0, increase the 200m threshold in Step 1.
+
+--- Check that columns exist with correct types ---
+SELECT column_name, data_type, udt_name 
+FROM information_schema.columns 
+WHERE table_name = 'PanIndiaRoad'
+ORDER BY ordinal_position;
+-- Expected output:
+--   gid     | integer  | int4
+--   source  | integer  | int4
+--   target  | integer  | int4
+--   geom    | USER-DEFINED | geometry
+
+--- Verify geometry SRID is 4326 ---
+SELECT DISTINCT ST_SRID(geom) FROM "PanIndiaRoad" LIMIT 1;
+-- Expected: 4326
+
+--- Verify geometry type is LINESTRING ---
+SELECT DISTINCT GeometryType(geom) FROM "PanIndiaRoad" LIMIT 1;
+-- Expected: LINESTRING
+
+--- Verify indexes were created ---
+SELECT indexname FROM pg_indexes WHERE tablename = 'PanIndiaRoad';
+-- Expected: idx_panindiaroad_geom, idx_panindiaroad_source, idx_panindiaroad_target
+
+--- Quick routing sanity test (pick two random connected nodes) ---
+SELECT source, target FROM "PanIndiaRoad" LIMIT 1;
+-- Use the returned source/target values to test a minimal A* call:
+-- SELECT * FROM pgr_aStar(
+--     'SELECT gid as id, source, target,
+--             ST_Length(geom::geography) as cost,
+--             ST_Length(geom::geography) as reverse_cost,
+--             ST_X(ST_StartPoint(geom)) as x1,
+--             ST_Y(ST_StartPoint(geom)) as y1,
+--             ST_X(ST_EndPoint(geom)) as x2,
+--             ST_Y(ST_EndPoint(geom)) as y2
+--      FROM "PanIndiaRoad"',
+--     <source_value>, <target_value>, directed := false
+-- );

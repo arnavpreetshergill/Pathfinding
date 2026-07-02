@@ -8,6 +8,8 @@
     "start": "ng serve --open",
     "build": "ng build --configuration production",
     "electron": "ng build && electron .",
+    "electron-only": "electron .",
+    "electron-direct": "node_modules\\electron\\dist\\electron.exe .",
     "electron-dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron . --dev\"",
     "test": "ng test",
     "pack": "ng build && electron-builder --dir",

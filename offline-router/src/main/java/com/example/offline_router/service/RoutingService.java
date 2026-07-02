@@ -76,7 +76,7 @@ public class RoutingService {
             
             String substringSql = """
                     SELECT ST_AsGeoJSON(ST_LineSubstring(geom, least(?, ?), greatest(?, ?))) as geojson
-                    FROM roads_lines
+                    FROM "PanIndiaRoad"
                     WHERE gid = ?
                     """;
             List<String> geoJsonRoute = jdbcTemplate.query(substringSql, (rs, rowNum) -> rs.getString("geojson"),
@@ -98,16 +98,21 @@ public class RoutingService {
         }
 
         // 2. Query pgr_aStar shortest path algorithm and retrieve geometries as GeoJSON format
-        // Filter out non-vehicle paths to improve routing
+        // cost/reverse_cost/x1/y1/x2/y2 are computed on-the-fly from geom
         String sql = """
                 SELECT ST_AsGeoJSON(r.geom) as geojson
                 FROM pgr_aStar(
-                    'SELECT gid as id, source, target, cost, reverse_cost, x1, y1, x2, y2 
-                     FROM roads_lines 
-                     WHERE highway NOT IN (''track'', ''path'', ''footway'', ''steps'', ''pedestrian'', ''construction'')',
+                    'SELECT gid as id, source, target,
+                            ST_Length(geom::geography) as cost,
+                            ST_Length(geom::geography) as reverse_cost,
+                            ST_X(ST_StartPoint(geom)) as x1,
+                            ST_Y(ST_StartPoint(geom)) as y1,
+                            ST_X(ST_EndPoint(geom)) as x2,
+                            ST_Y(ST_EndPoint(geom)) as y2
+                     FROM "PanIndiaRoad"',
                     ?::bigint, ?::bigint, directed := false
                 ) AS p
-                JOIN roads_lines r ON p.edge = r.gid
+                JOIN "PanIndiaRoad" r ON p.edge = r.gid
                 ORDER BY p.seq
                 LIMIT 10000
                 """;
@@ -143,8 +148,7 @@ public class RoutingService {
                         target, 
                         geom,
                         ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)) as snap_pt
-                    FROM roads_lines
-                    WHERE highway NOT IN ('track', 'path', 'footway', 'steps', 'pedestrian', 'construction')
+                    FROM "PanIndiaRoad"
                     ORDER BY geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
                     LIMIT 1
                 )
@@ -170,86 +174,38 @@ public class RoutingService {
     }
 
     /**
-     * Retrieves road geometries within the given bounding box, filtered by
-     * highway classification appropriate for the map zoom level.
-     * Returns each road as a full GeoJSON Feature (not raw Geometry) so
-     * Leaflet can render it directly via L.geoJSON().
+     * Retrieves road geometries within the given bounding box.
+     * Returns each road as GeoJSON so Leaflet can render it directly.
+     * No highway column filtering — returns all road segments in the viewport.
      *
      * @param minLng West boundary.
      * @param minLat South boundary.
      * @param maxLng East boundary.
      * @param maxLat North boundary.
-     * @param zoom   Current map zoom level (determines which road types to
-     *               include).
-     * @return List of maps, each with "type":"Feature", "geometry":{...},
-     *         "properties":{...}.
+     * @param zoom   Current map zoom level (used to cap result count).
+     * @return List of maps, each with "geojson" key.
      */
     public List<Map<String, Object>> getRoadsInBounds(double minLng, double minLat,
             double maxLng, double maxLat, int zoom) {
 
-        List<String> types = getHighwayTypesForZoom(zoom);
-        // Build parameterized IN clause
-        StringBuilder inClause = new StringBuilder();
-        for (int i = 0; i < types.size(); i++) {
-            if (i > 0)
-                inClause.append(", ");
-            inClause.append("?");
-        }
+        // Scale result limit by zoom: fewer roads at low zooms, more at high zooms
+        int limit = zoom <= 8 ? 2000 : zoom <= 11 ? 5000 : 8000;
 
-        String sql = String.format("""
-                SELECT name, highway, ST_AsGeoJSON(geom) as geojson
-                FROM roads_lines
+        String sql = """
+                SELECT ST_AsGeoJSON(geom) as geojson
+                FROM "PanIndiaRoad"
                 WHERE geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)
-                  AND highway IN (%s)
-                LIMIT 5000
-                """, inClause.toString());
-
-        // Build parameter array: minLng, minLat, maxLng, maxLat, then highway types
-        Object[] params = new Object[4 + types.size()];
-        params[0] = minLng;
-        params[1] = minLat;
-        params[2] = maxLng;
-        params[3] = maxLat;
-        for (int i = 0; i < types.size(); i++) {
-            params[4 + i] = types.get(i);
-        }
+                LIMIT ?
+                """;
 
         logger.debug("Fetching roads in bounds [{},{},{},{}] zoom={}", minLng, minLat, maxLng, maxLat, zoom);
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Map<String, Object> road = new HashMap<>();
             road.put("geojson", rs.getString("geojson"));
-            road.put("name", rs.getString("name"));
-            road.put("highway", rs.getString("highway"));
+            road.put("name", null);
+            road.put("highway", "road");
             return road;
-        }, params);
-    }
-
-    /**
-     * Maps zoom level to the highway types that should be visible at that scale.
-     * Lower zooms show only major roads; higher zooms progressively add minor
-     * roads.
-     */
-    private List<String> getHighwayTypesForZoom(int zoom) {
-        if (zoom <= 7) {
-            return List.of("motorway", "trunk", "motorway_link", "trunk_link");
-        } else if (zoom == 8) {
-            return List.of("motorway", "trunk", "primary",
-                    "motorway_link", "trunk_link", "primary_link");
-        } else if (zoom == 9) {
-            return List.of("motorway", "trunk", "primary", "secondary",
-                    "motorway_link", "trunk_link", "primary_link", "secondary_link");
-        } else if (zoom == 10) {
-            return List.of("motorway", "trunk", "primary", "secondary", "tertiary",
-                    "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link");
-        } else if (zoom == 11) {
-            return List.of("motorway", "trunk", "primary", "secondary", "tertiary",
-                    "unclassified", "road",
-                    "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link");
-        } else {
-            return List.of("motorway", "trunk", "primary", "secondary", "tertiary",
-                    "unclassified", "road", "residential", "living_street", "service",
-                    "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link");
-        }
+        }, minLng, minLat, maxLng, maxLat, limit);
     }
 }
