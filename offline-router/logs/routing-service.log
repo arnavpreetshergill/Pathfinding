@@ -1,0 +1,8 @@
+2026-07-16 11:41:28 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.offline_router.OfflineRouterApplicationTests]: OfflineRouterApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-16 11:41:28 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.offline_router.OfflineRouterApplication for test class com.example.offline_router.OfflineRouterApplicationTests
+2026-07-16 11:41:28 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.offline_router.OfflineRouterApplicationTests]: OfflineRouterApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-16 11:41:28 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.offline_router.OfflineRouterApplication for test class com.example.offline_router.OfflineRouterApplicationTests
+2026-07-16 11:41:29 [main] INFO  c.e.o.OfflineRouterApplicationTests - Starting OfflineRouterApplicationTests using Java 17.0.18 with PID 32304 (started by Admin in C:\Users\Admin\Desktop\apps\DRDO2\offline-router)
+2026-07-16 11:41:29 [main] DEBUG c.e.o.OfflineRouterApplicationTests - Running with Spring Boot v4.1.0, Spring v7.0.8
+2026-07-16 11:41:29 [main] INFO  c.e.o.OfflineRouterApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-07-16 11:41:30 [main] INFO  c.e.o.OfflineRouterApplicationTests - Started OfflineRouterApplicationTests in 1.808 seconds (process running for 3.229)
