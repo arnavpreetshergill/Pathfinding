@@ -1,0 +1,74 @@
+3. METHODOLOGY AND SOFTWARE REQUIREMENTS
+
+3.1. METHODOLOGY
+
+The development of this offline routing web application adhered to an Agile software development methodology, specifically utilizing an iterative and incremental approach. The Agile methodology was chosen over traditional Waterfall models due to its inherent flexibility, allowing for continuous integration, rapid prototyping, and immediate adaptation to technical challenges discovered during the implementation of complex spatial algorithms. 
+
+The project was divided into a series of highly focused sprints, each targeting a specific architectural layer. The initial sprint focused entirely on database preparation and topology creation. It was critical to ensure that the spatial data was correctly imported into PostgreSQL and that the pgRouting topology functions successfully generated the necessary vertex and edge networks. Once the database foundation was solid, subsequent sprints focused on backend API development, ensuring that the Spring Boot application could successfully construct and execute A* queries and format the output into standard GeoJSON. The final sprints concentrated on the frontend Single Page Application (SPA), building the Angular interface, integrating the Leaflet map engine, and fine-tuning the static HTTP server necessary for rendering local map tiles seamlessly.
+
+Architecturally, the system employs a strict Model-View-Controller (MVC) design pattern, separated physically across the frontend and backend boundaries. 
+- Model: The Model layer is entirely encapsulated within the PostgreSQL/PostGIS database. It holds the fundamental data structures—the geometric linestrings of the roads, the node IDs, and the graph weights. 
+- Controller: The Controller layer is managed by the Spring Boot backend. It exposes RESTful API endpoints (specifically `RoutingController.java`), processes incoming HTTP GET requests containing latitude and longitude parameters, validates these inputs, and delegates the complex business logic to the `RoutingService.java`. The service layer constructs the SQL queries, executes them against the Model, and returns the serialized JSON response.
+- View: The View layer is implemented via the Angular framework. It operates in the user's web browser, rendering the interactive map interface, capturing user click events to gather coordinates, and drawing the resulting GeoJSON paths returned by the Controller. 
+
+This strict decoupling of concerns ensures that the application is highly modular. The frontend Angular application is entirely agnostic to the underlying database technology; it merely consumes standard HTTP JSON APIs. Conversely, the backend Spring Boot application is stateless and unconcerned with how the data is visualized, focusing purely on rapid query execution. This architecture allows for isolated testing, easier debugging, and future scalability.
+
+3.2. SOFTWARE REQUIREMENTS
+
+The realization of this completely offline, autonomous routing system necessitated a carefully curated technology stack, leveraging industry-standard, open-source software tools.
+
+Backend Framework: Java 17 and Spring Boot (v3.x)
+Java was selected as the core programming language for the backend due to its unparalleled stability, extensive ecosystem, and exceptional multithreading capabilities. Spring Boot was chosen as the web framework because of its rapid application development features, auto-configuration capabilities, and robust dependency injection mechanisms. Spring Boot provides an embedded Tomcat web server, allowing the backend application to run as a standalone, executable JAR file without requiring the installation of a separate, heavy application server. This aligns perfectly with the goal of creating a portable, easily deployable offline system. Furthermore, Spring Data JPA (Java Persistence API) and JDBC templates provide highly efficient, secure mechanisms for interacting with the relational database, preventing SQL injection vulnerabilities while ensuring maximum query performance.
+
+Frontend Framework: Angular (v18)
+Angular, maintained by Google, was selected as the frontend framework. Angular is a comprehensive, component-based TypeScript framework designed for building scalable web applications. Unlike lighter libraries such as React or Vue, Angular provides a highly opinionated, structured environment out-of-the-box, including powerful HTTP client modules, robust forms handling, and a sophisticated dependency injection system. The use of TypeScript ensures strict typing, reducing runtime errors and improving code maintainability. The component-driven architecture allows the user interface to be broken down into reusable, modular pieces, such as the map rendering component and the routing input forms.
+
+Mapping Library: Leaflet.js
+Leaflet is the leading open-source JavaScript library for mobile-friendly interactive maps. It was chosen over alternatives like OpenLayers due to its extreme lightweight nature (weighing only about 42 KB of JS), simplicity, and high performance. Leaflet handles the complex mathematics of projecting spherical earth coordinates (Latitude/Longitude) onto a flat 2D screen using the Web Mercator projection (EPSG:3857). Crucially, Leaflet allows for seamless integration of custom TileLayers, which is the foundational mechanism used to render the local, static map images without relying on external servers.
+
+Database Management System: PostgreSQL
+PostgreSQL is universally recognized as the world's most advanced open-source relational database. It is highly extensible, ACID-compliant, and built to handle massive datasets and concurrent connections. It was chosen over alternatives like MySQL or SQLite entirely because of its unparalleled support for spatial data extensions.
+
+Spatial Extensions: PostGIS and pgRouting
+PostGIS transforms PostgreSQL into a highly sophisticated spatial database. It introduces geometric and geographic data types (Points, Lines, Polygons) and provides hundreds of spatial functions (e.g., calculating distance, area, intersection, and buffering). PostGIS implements the R-Tree (GiST) spatial indexes that are absolutely critical for achieving sub-second nearest-neighbor snapping queries. 
+pgRouting extends PostGIS by providing graph network analysis capabilities. It implements highly optimized, C++ based algorithms for pathfinding, including Dijkstra, A*, and Traveling Salesperson Problem (TSP) solvers. By executing the pathfinding algorithm directly within the database layer using pgRouting, the system avoids the enormous overhead of transferring massive amounts of road geometry data over the network to the Java backend for processing.
+
+Static Server: Node.js http-server
+To serve the massive directory containing millions of static `.jpg` map tiles, a lightweight, highly concurrent static web server was required. The Node.js-based `http-server` package was selected for its simplicity and ability to be run via `npx` with a single command. By serving the tiles on a separate local port (e.g., 8081) and configuring the Angular development server to proxy specific requests to it, the system circumvents the severe build-time limitations of attempting to bundle millions of image files directly into the Angular application asset pipeline, preventing fatal "Maximum call stack size exceeded" errors during compilation.
+
+
+4. IMPLEMENTATION
+
+4.1. BACKEND
+
+The backend implementation is the computational engine of the routing application. It is constructed using Spring Boot and is fundamentally responsible for translating incoming HTTP requests from the Angular frontend into complex SQL queries, executing those queries against the PostGIS database, and serializing the geometric results into a universally readable JSON format.
+
+4.1.1. Application Architecture and Configuration
+The Spring Boot application follows a standard layered architecture, divided into Controllers, Services, and Configuration files. 
+The database connection is established via the `application.properties` file, which utilizes the standard JDBC PostgreSQL driver. To ensure dynamic deployment, the configuration utilizes environment variables with fallback defaults (e.g., `spring.datasource.url=jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ind_routing}`). This allows the application to connect to the `ind_routing` database seamlessly. Furthermore, the embedded Tomcat server is explicitly bound to port 8080 (`server.port=8080`) to ensure consistent, predictable communication with the frontend application.
+
+4.1.2. The Routing Controller
+The entry point for the backend logic is the `RoutingController.java` class, annotated with `@RestController` and `@RequestMapping("/api/routing")`. This controller exposes a primary GET endpoint mapping `/roads`. It is designed to accept four required query parameters: `startLat`, `startLng`, `endLat`, and `endLng`, which represent the decimal degrees of the user's selected start and destination points on the map.
+Crucially, the controller is annotated with `@CrossOrigin(origins = "http://localhost:4200")`. In modern web development, browsers enforce strict Same-Origin Policies (SOP) to prevent malicious scripts on one domain from accessing data on another. Because the Angular frontend runs on port 4200 and the Spring Boot backend runs on port 8080, they are considered different origins. The `@CrossOrigin` annotation explicitly configures the backend to emit the necessary Cross-Origin Resource Sharing (CORS) HTTP headers, permitting the Angular application to successfully execute asynchronous `fetch` or `HttpClient` requests without being blocked by the browser.
+
+4.1.3. Nearest Neighbor Snapping Logic
+When the controller receives the coordinate parameters, it passes them to the `RoutingService.java`. The absolute first step in the routing calculation is addressing the "snapping" problem. User clicks on a visual map rarely perfectly intersect the mathematical linestrings representing roads in the database. If the pathfinding algorithm is given a start point that is not part of the routing graph topology, it will fail instantly.
+
+The `RoutingService` employs a sophisticated PostGIS SQL query to perform a Nearest Neighbor search. It uses the `ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)` function to convert the raw floating-point numbers into a formal spatial Point geometry, explicitly tagging it with Spatial Reference System Identifier (SRID) 4326, which represents the standard WGS 84 coordinate system used by GPS and web maps.
+To find the closest valid node on the road network, the service queries the vertices table (generated by pgRouting during topology creation). The query leverages the highly optimized PostGIS `<->` operator in the `ORDER BY` clause, combined with a `LIMIT 1`. 
+The `<->` operator calculates the 2D bounding box distance between two geometries. Crucially, when used in an `ORDER BY` clause, PostgreSQL recognizes this operator and employs the GiST (R-Tree) spatial index rather than performing a full table scan. This allows the database to instantly snap the user's click to the nearest valid graph node (vertex ID) in milliseconds, regardless of the size of the database. This snapping process is performed twice per request: once for the starting coordinates and once for the destination coordinates.
+
+4.1.4. The A* (A-Star) Routing Query
+Once the starting node ID (`source`) and ending node ID (`target`) are determined, the `RoutingService` constructs the primary pathfinding query. The system utilizes the `pgr_astar` function provided by the pgRouting extension.
+
+The `pgr_astar` function requires a complex SQL string as its first argument, which defines the graph edges. The inner SQL query is structured to select the `id`, `source`, `target`, `cost`, `reverse_cost`, `x1`, `y1`, `x2`, and `y2` from the `roads_lines` table. 
+- `cost` represents the length of the road segment for forward traversal.
+- `reverse_cost` represents the cost for traveling in the opposite direction (used to enforce one-way streets; if a street is one-way, the reverse cost is set to a highly prohibitive value, essentially preventing the algorithm from traversing it backwards).
+- `x1, y1` and `x2, y2` represent the coordinates of the start and end points of each edge. These are strictly required by the A* algorithm to calculate the heuristic distance (the estimated straight-line distance to the goal), allowing it to aggressively optimize its search direction.
+
+The output of the `pgr_astar` function is a sequence of edges that form the optimal route. However, the raw output is merely a list of edge IDs and node IDs. To render the route on the frontend, the service must perform an `INNER JOIN` between the results of the `pgr_astar` function and the original `roads_lines` table based on the edge ID (`id`). This join retrieves the actual spatial linestring geometries of the roads that make up the path.
+
+4.1.5. GeoJSON Construction and Serialization
+The final step in the backend process is formatting the geometric data for the frontend. Leaflet.js natively expects spatial data in the GeoJSON format—an open standard format designed for representing simple geographical features along with their non-spatial attributes based on JavaScript Object Notation.
+
+The `RoutingService` utilizes the PostGIS `ST_AsGeoJSON` function. It aggregates the individual linestring geometries retrieved by the A* query into a unified GeoJSON `FeatureCollection`. By executing `jsonb_build_object` and `jsonb_agg` directly within the PostgreSQL query string, the database is tasked with constructing the exact JSON string format required. This is a highly optimized approach; rather than retrieving raw geometric byte arrays into the Java application and using complex serialization libraries (like Jackson) to parse and re-format them, the Spring Boot application simply retrieves a single, pre-formatted `String` from the database and returns it directly in the HTTP response body. This drastically reduces CPU and memory overhead on the JVM, ensuring that the REST API remains incredibly fast and responsive.

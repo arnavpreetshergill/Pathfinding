@@ -1,0 +1,5 @@
+Host: localhost
+Port: 5432
+Database Name: test4
+Username: pgAdmin
+Password: admin

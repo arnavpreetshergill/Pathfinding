@@ -10,7 +10,6 @@ import java.util.Map;
 
 /**
  * REST controller verifying application runtime state and database connection health.
- * Used for deployment status checking and diagnostic monitoring.
  */
 @RestController
 @RequestMapping("/api/health")
@@ -21,10 +20,7 @@ public class HealthController {
     private JdbcTemplate jdbcTemplate;
 
     /**
-     * Checks if the Spring application is up and executes a dummy query
-     * against the PostgreSQL database to verify connection pool health.
-     *
-     * @returns ResponseEntity containing status payload and appropriate HTTP code.
+     * Checks if the Spring application is up and executes a dummy query against the PostgreSQL database.
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> health() {

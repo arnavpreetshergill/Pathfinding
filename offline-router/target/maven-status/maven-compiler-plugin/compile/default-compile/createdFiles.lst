@@ -1,5 +1,4 @@
+com\example\offline_router\controller\RoutingController.class
 com\example\offline_router\service\RoutingService.class
-com\example\offline_router\config\MaskedMessageConverter.class
 com\example\offline_router\controller\HealthController.class
 com\example\offline_router\OfflineRouterApplication.class
-com\example\offline_router\controller\RoutingController.class

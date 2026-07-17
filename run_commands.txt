@@ -1,0 +1,40 @@
+=========================================================
+OFFLINE ROUTING APPLICATION - RUN COMMANDS (NO NPM)
+=========================================================
+
+To run the application on the new PC without using 'npm', you will need to open three separate Command Prompts (terminals). 
+
+Because 'npm' is restricted, we will use the 'node' command directly to execute the binaries located inside your local 'node_modules' folder.
+
+---------------------------------------------------------
+TERMINAL 1: START THE BACKEND (Spring Boot)
+---------------------------------------------------------
+1. Open a Command Prompt.
+2. Navigate to the offline-router folder:
+   cd path\to\DRDO2\offline-router
+3. Run the application using the included Maven Wrapper:
+   mvnw.cmd spring-boot:run
+
+   (Note: If you have already built the project into a jar, you can simply run: java -jar target\offline-router-0.0.1-SNAPSHOT.jar)
+
+---------------------------------------------------------
+TERMINAL 2: START THE MAP TILE SERVER (Static HTTP)
+---------------------------------------------------------
+1. Open a new Command Prompt.
+2. Navigate to the offline-routing-desktop folder:
+   cd path\to\DRDO2\offline-routing-desktop
+3. Run the local http-server binary directly using node:
+   node node_modules\http-server\bin\http-server ./ -p 8081 --cors
+
+   (Note: If this fails because http-server isn't installed in that specific folder, and the PC has Python installed, you can use Python as an alternative: python -m http.server 8081)
+
+---------------------------------------------------------
+TERMINAL 3: START THE FRONTEND (Angular UI)
+---------------------------------------------------------
+1. Open a new Command Prompt.
+2. Navigate to the offline-routing-desktop folder:
+   cd path\to\DRDO2\offline-routing-desktop
+3. Run the local Angular CLI binary directly using node to serve the app:
+   node node_modules\@angular\cli\bin\ng serve --open
+
+The map will automatically open in your default browser at http://localhost:4200 once it finishes compiling!
